@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Egy Cima | مشاهدة وتحميل الأفلام والمسلسلات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0d;
+  --bg-alt:#111013;
+  --surface:#18161a;
+  --surface-2:#211d22;
+  --line: rgba(255,255,255,.08);
+  --red:#d4143a;
+  --red-bright:#ff2d4a;
+  --red-dim:#5c0e1f;
+  --text:#f3efee;
+  --text-dim:#a79ca1;
+  --gold:#d9a441;
+  --radius: 10px;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Tajawal', sans-serif;
+  min-height:100vh;
+}
+h1,h2,h3,h4,.brand,.btn,.nav a{font-family:'Cairo', sans-serif;}
+img{max-width:100%; display:block;}
+a{color:inherit; text-decoration:none;}
+button{font-family:inherit; cursor:pointer; border:none;}
+::selection{background:var(--red); color:#fff;}
+::-webkit-scrollbar{height:8px; width:8px;}
+::-webkit-scrollbar-thumb{background:var(--red-dim); border-radius:10px;}
+::-webkit-scrollbar-track{background:var(--bg-alt);}
+
+/* ---------- Header ---------- */
+.site-header{
+  position:sticky; top:0; z-index:50;
+  background:rgba(10,10,13,.92);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.header-inner{
+  max-width:1280px; margin:0 auto; padding:14px 20px;
+  display:flex; align-items:center; gap:22px;
+}
+.brand{
+  display:flex; align-items:center; gap:10px;
+  font-weight:900; font-size:24px; letter-spacing:.5px; white-space:nowrap;
+  cursor:pointer;
+}
+.brand .clap{width:34px; height:34px; flex:none;}
+.brand span.hl{color:var(--red-bright);}
+.nav{display:flex; gap:4px; flex:1;}
+.nav a{
+  padding:9px 14px; border-radius:8px; font-weight:700; font-size:15px;
+  color:var(--text-dim); transition:.2s;
+}
+.nav a:hover, .nav a.active{color:#fff; background:var(--surface-2);}
+.search-box{
+  display:flex; align-items:center; background:var(--surface);
+  border:1px solid var(--line); border-radius:30px; padding:6px 6px 6px 14px;
+  width:250px; transition:.2s;
+}
+.search-box:focus-within{border-color:var(--red);}
+.search-box input{
+  background:none; border:none; outline:none; color:var(--text);
+  font-family:inherit; flex:1; font-size:14px;
+}
+.search-box input::placeholder{color:var(--text-dim);}
+.search-box button{
+  background:var(--red); color:#fff; width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; flex:none;
+}
+.admin-toggle{
+  background:transparent; border:1px solid var(--red-dim); color:var(--red-bright);
+  padding:9px 16px; border-radius:8px; font-weight:700; font-size:14px; white-space:nowrap;
+  transition:.2s;
+}
+.admin-toggle:hover{background:var(--red); color:#fff; border-color:var(--red);}
+
+/* ---------- Filmstrip signature ---------- */
+.filmstrip{position:relative; height:16px; background:var(--red); overflow:hidden;}
+.filmstrip::before, .filmstrip::after{
+  content:""; position:absolute; right:-2px; left:-2px; height:7px;
+  background-image:radial-gradient(circle, var(--bg) 3px, transparent 3.3px);
+  background-size:17px 7px; background-repeat:repeat-x;
+}
+.filmstrip::before{top:1px;}
+.filmstrip::after{bottom:1px;}
+.filmstrip.thin{height:10px;}
+.filmstrip.thin::before, .filmstrip.thin::after{height:4px; background-size:14px 4px;
+  background-image:radial-gradient(circle, var(--bg) 2px, transparent 2.2px);}
+
+/* ---------- Marquee ---------- */
+.marquee-bar{
+  background:var(--bg-alt); border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:10px; padding:7px 20px; overflow:hidden;
+}
+.bulbs{display:flex; gap:6px; flex:none;}
+.bulbs span{
+  width:6px; height:6px; border-radius:50%; background:var(--red-dim);
+  animation:blink 1.4s infinite;
+}
+.bulbs span:nth-child(odd){animation-delay:.35s;}
+.marquee-track{
+  flex:1; overflow:hidden; white-space:nowrap; position:relative; height:18px;
+}
+.marquee-track p{
+  position:absolute; will-change:transform;
+  animation:scroll-x 26s linear infinite;
+  font-size:13px; color:var(--text-dim); font-weight:500;
+}
+.marquee-track p b{color:var(--red-bright); font-weight:800;}
+@keyframes blink{0%,100%{background:var(--red-dim);} 50%{background:var(--red-bright); box-shadow:0 0 6px var(--red-bright);}}
+@keyframes scroll-x{from{transform:translateX(110%);} to{transform:translateX(-110%);}}
+
+/* ---------- Layout ---------- */
+main{max-width:1280px; margin:0 auto; padding:0 20px 60px;}
+.view{display:none;}
+.view.active{display:block;}
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative; margin-top:24px; border-radius:16px; overflow:hidden;
+  min-height:380px; display:flex; align-items:flex-end;
+  background:#000;
+}
+.hero img.backdrop{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.55;}
+.hero::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(90deg, rgba(10,10,13,.98) 10%, rgba(10,10,13,.55) 55%, transparent 100%),
+             linear-gradient(0deg, rgba(10,10,13,1) 0%, transparent 45%);
+}
+.hero-content{position:relative; z-index:2; padding:36px; max-width:640px;}
+.hero-badge{
+  display:inline-flex; align-items:center; gap:6px; background:var(--red);
+  padding:4px 12px; border-radius:20px; font-size:12px; font-weight:800; margin-bottom:14px;
+}
+.hero-content h1{font-size:36px; font-weight:900; margin-bottom:10px; line-height:1.3;}
+.hero-meta{display:flex; gap:10px; flex-wrap:wrap; color:var(--text-dim); font-size:14px; margin-bottom:14px;}
+.hero-meta span{background:var(--surface-2); padding:3px 10px; border-radius:6px;}
+.hero-desc{color:var(--text-dim); font-size:14.5px; line-height:1.9; margin-bottom:20px;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;}
+.hero-actions{display:flex; gap:12px;}
+.btn{
+  padding:12px 26px; border-radius:8px; font-weight:800; font-size:15px;
+  display:inline-flex; align-items:center; gap:8px; transition:.2s;
+}
+.btn-primary{background:var(--red); color:#fff;}
+.btn-primary:hover{background:var(--red-bright);}
+.btn-ghost{background:rgba(255,255,255,.08); color:#fff; border:1px solid var(--line);}
+.btn-ghost:hover{background:rgba(255,255,255,.16);}
+
+/* ---------- Sections ---------- */
+.section{margin-top:44px;}
+.section-head{display:flex; align-items:center; gap:14px; margin-bottom:16px;}
+.section-eyebrow{display:flex; gap:3px;}
+.section-eyebrow span{width:5px; height:5px; border-radius:50%; background:var(--red-dim);}
+.section-head h2{font-size:20px; font-weight:800;}
+.section-head .count{color:var(--text-dim); font-size:13px; font-weight:500;}
+.row{
+  display:flex; gap:16px; overflow-x:auto; padding-bottom:10px; scroll-snap-type:x proximity;
+}
+.empty-state{
+  color:var(--text-dim); font-size:14px; background:var(--surface); border:1px dashed var(--line);
+  border-radius:10px; padding:22px; text-align:center;
+}
+
+/* ---------- Card ---------- */
+.card{
+  flex:none; width:170px; scroll-snap-align:start; cursor:pointer;
+  transition:.25s transform;
+}
+.card:hover{transform:translateY(-6px);}
+.poster-wrap{position:relative; border-radius:10px; overflow:hidden; aspect-ratio:2/3; background:var(--surface);
+  border:1px solid var(--line);}
+.poster-wrap img{width:100%; height:100%; object-fit:cover; transition:.3s;}
+.card:hover .poster-wrap img{filter:brightness(.55);}
+.play-hint{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  opacity:0; transition:.25s;
+}
+.card:hover .play-hint{opacity:1;}
+.play-hint .circle{
+  width:46px; height:46px; border-radius:50%; background:var(--red); display:flex; align-items:center;
+  justify-content:center; box-shadow:0 0 20px rgba(212,20,58,.6);
+}
+.badge{
+  position:absolute; top:8px; right:8px; background:var(--red); color:#fff; font-size:11px;
+  font-weight:800; padding:3px 8px; border-radius:5px;
+}
+.badge.cat{right:auto; left:8px; background:rgba(0,0,0,.65); border:1px solid var(--line);}
+.card-title{font-size:14px; font-weight:700; margin-top:9px; line-height:1.4;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+.card-sub{font-size:12px; color:var(--text-dim); margin-top:4px; display:flex; align-items:center; gap:6px;}
+.card-sub .star{color:var(--gold);}
+
+/* ---------- Detail view ---------- */
+.detail-top{position:relative; border-radius:16px; overflow:hidden; margin-top:24px;}
+.detail-top img.backdrop{width:100%; height:280px; object-fit:cover; opacity:.4;}
+.detail-top::after{content:""; position:absolute; inset:0; background:linear-gradient(0deg, var(--bg), transparent 70%);}
+.detail-body{display:flex; gap:28px; margin-top:-140px; position:relative; z-index:2; flex-wrap:wrap;}
+.detail-poster{width:220px; flex:none; border-radius:12px; overflow:hidden; border:1px solid var(--line);
+  box-shadow:0 10px 30px rgba(0,0,0,.5);}
+.detail-info{flex:1; min-width:280px; padding-top:120px;}
+.detail-info h1{font-size:30px; font-weight:900; margin-bottom:10px;}
+.detail-tags{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+.detail-tags span{background:var(--surface-2); border:1px solid var(--line); padding:5px 12px; border-radius:7px; font-size:13px; color:var(--text-dim);}
+.detail-story{color:var(--text-dim); line-height:2; font-size:15px; max-width:760px; margin-bottom:24px;}
+.tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+.tab-btn{
+  padding:9px 18px; border-radius:8px; background:var(--surface); border:1px solid var(--line);
+  color:var(--text-dim); font-weight:700; font-size:14px; transition:.2s;
+}
+.tab-btn.active{background:var(--red); color:#fff; border-color:var(--red);}
+.player{
+  background:#000; border-radius:12px; overflow:hidden; border:1px solid var(--line); margin-bottom:34px;
+  aspect-ratio:16/9; display:flex; align-items:center; justify-content:center;
+}
+.player iframe{width:100%; height:100%; border:none;}
+.player .placeholder{color:var(--text-dim); font-size:14px; text-align:center; padding:20px;}
+.dl-list{display:flex; flex-direction:column; gap:10px;}
+.dl-row{
+  display:flex; align-items:center; justify-content:space-between; background:var(--surface);
+  border:1px solid var(--line); border-radius:10px; padding:14px 18px; transition:.2s;
+}
+.dl-row:hover{border-color:var(--red-dim); background:var(--surface-2);}
+.dl-left{display:flex; align-items:center; gap:12px;}
+.dl-left .qtag{background:var(--red-dim); color:var(--red-bright); font-weight:800; font-size:12px; padding:4px 10px; border-radius:6px;}
+.dl-btn{background:var(--red); color:#fff; padding:8px 18px; border-radius:7px; font-weight:800; font-size:13px;}
+.dl-btn:hover{background:var(--red-bright);}
+
+/* ---------- Admin ---------- */
+.admin-panel{
+  position:relative;
+  margin-top:28px; background:var(--surface); border:1px solid var(--red-dim); border-radius:14px;
+  padding:28px; box-shadow:0 0 0 1px rgba(212,20,58,.08), 0 20px 50px rgba(0,0,0,.4);
+}
+.admin-panel h2{color:var(--red-bright); font-size:20px; font-weight:900; display:flex; align-items:center; gap:10px; margin-bottom:22px;}
+.field-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px;}
+.field{display:flex; flex-direction:column; gap:7px;}
+.field.full{grid-column:1/-1;}
+.field label{font-size:13px; font-weight:700; color:var(--text-dim);}
+.field input, .field select, .field textarea{
+  background:var(--bg-alt); border:1px solid var(--line); border-radius:8px; padding:11px 14px;
+  color:var(--text); font-family:inherit; font-size:14px; outline:none; transition:.2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus{border-color:var(--red);}
+.field textarea{resize:vertical; min-height:90px; line-height:1.8;}
+.sub-title{font-size:14px; font-weight:800; color:var(--text); margin:26px 0 10px; display:flex; align-items:center; gap:8px;}
+.dyn-row{display:grid; grid-template-columns:1fr 2fr auto; gap:10px; margin-bottom:10px;}
+.dyn-row input{background:var(--bg-alt); border:1px solid var(--line); border-radius:8px; padding:10px 12px; color:var(--text); font-family:inherit; font-size:13.5px; outline:none;}
+.dyn-row input:focus{border-color:var(--red);}
+.icon-btn{
+  width:40px; height:40px; border-radius:8px; background:var(--surface-2); border:1px solid var(--line);
+  color:var(--text-dim); display:flex; align-items:center; justify-content:center; flex:none; transition:.2s;
+}
+.icon-btn:hover{color:var(--red-bright); border-color:var(--red-dim);}
+.add-row-btn{
+  background:none; border:1px dashed var(--red-dim); color:var(--red-bright); font-weight:700;
+  font-size:13.5px; padding:9px 16px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;
+}
+.add-row-btn:hover{background:rgba(212,20,58,.08);}
+.publish-btn{
+  width:100%; margin-top:26px; background:var(--red); color:#fff; padding:15px; border-radius:10px;
+  font-weight:900; font-size:16px; display:flex; align-items:center; justify-content:center; gap:10px;
+  transition:.2s;
+}
+.publish-btn:hover{background:var(--red-bright); box-shadow:0 8px 24px rgba(212,20,58,.35);}
+.code-box{
+  margin-top:24px; background:var(--bg-alt); border:1px solid var(--line); border-radius:10px; padding:16px;
+  font-family:'Courier New', monospace; font-size:12.5px; color:var(--text-dim); white-space:pre-wrap;
+  max-height:220px; overflow:auto; direction:ltr; text-align:left;
+}
+.code-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+.code-head h3{font-size:15px; color:var(--red-bright); font-weight:800;}
+.copy-btn{background:var(--surface-2); border:1px solid var(--line); color:var(--text); padding:7px 14px; border-radius:7px; font-size:12.5px; font-weight:700;}
+.copy-btn:hover{border-color:var(--red-dim); color:var(--red-bright);}
+.panel-close{
+  position:absolute; top:18px; left:18px; width:36px; height:36px; border-radius:50%;
+  background:var(--surface-2); border:1px solid var(--line); color:var(--text-dim);
+  display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800;
+  transition:.2s; z-index:5;
+}
+.panel-close:hover{background:var(--red); color:#fff; border-color:var(--red);}
+.panel-close.on-image{position:absolute; top:16px; left:16px; background:rgba(0,0,0,.55);}
+
+/* ---------- Search / contact ---------- */
+.page-title{font-size:24px; font-weight:900; margin:28px 0 20px;}
+.grid-results{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:18px;}
+.contact-box{max-width:520px; margin:28px auto; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:30px;}
+.contact-box .field{margin-bottom:14px;}
+
+/* ---------- Toast ---------- */
+.toast{
+  position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(120%);
+  background:var(--red); color:#fff; padding:14px 26px; border-radius:10px; font-weight:800; font-size:14px;
+  z-index:200; transition:.35s; box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+footer{border-top:1px solid var(--line); margin-top:50px; padding:26px 20px; text-align:center; color:var(--text-dim); font-size:13px;}
+footer b{color:var(--red-bright);}
+
+@media(max-width:800px){
+  .header-inner{flex-wrap:wrap;}
+  .nav{order:3; width:100%; overflow-x:auto;}
+  .search-box{width:170px;}
+  .field-grid{grid-template-columns:1fr 1fr;}
+  .dyn-row{grid-template-columns:1fr 1fr auto;}
+  .hero-content h1{font-size:26px;}
+}
+@media(max-width:520px){
+  .field-grid{grid-template-columns:1fr;}
+  .admin-toggle{padding:9px 12px; font-size:13px;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand" data-nav="home">
+      <svg class="clap" viewBox="0 0 48 48" fill="none">
+        <rect x="4" y="18" width="40" height="26" rx="3" fill="#d4143a"/>
+        <path d="M4 18l4-10h6l-4 10H4z" fill="#151318"/>
+        <path d="M14 18l4-10h6l-4 10h-6z" fill="#f3efee"/>
+        <path d="M24 18l4-10h6l-4 10h-6z" fill="#151318"/>
+        <path d="M34 18l4-10h4l2 10h-10z" fill="#f3efee"/>
+        <rect x="9" y="26" width="30" height="4" rx="1" fill="#151318" opacity=".5"/>
+      </svg>
+      <span>Egy<span class="hl">Cima</span></span>
+    </div>
+    <nav class="nav">
+      <a href="#" data-nav="home" class="active">الرئيسية</a>
+      <a href="#" data-nav="movies">أفلام</a>
+      <a href="#" data-nav="series">مسلسلات</a>
+      <a href="#" data-nav="categories">تصنيفات</a>
+      <a href="#" data-nav="contact">اتصل بنا</a>
+      <a href="#" data-nav="admin">لوحة التحكم</a>
+    </nav>
+    <form class="search-box" id="searchForm">
+      <input id="searchInput" type="text" placeholder="ابحث عن فيلم أو مسلسل...">
+      <button type="submit" aria-label="بحث">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#fff" stroke-width="2"/><path d="M21 21l-4-4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </form>
+    <button class="admin-toggle" data-nav="admin">⚙ لوحة التحكم</button>
+  </div>
+</header>
+<div class="filmstrip"></div>
+<div class="marquee-bar">
+  <div class="bulbs"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="marquee-track"><p id="marqueeText">جاري التحميل...</p></div>
+  <div class="bulbs"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+</div>
+
+<main>
+
+  <!-- HOME -->
+  <section class="view active" id="view-home">
+    <div class="hero" id="hero"></div>
+    <div id="homeSections"></div>
+  </section>
+
+  <!-- DETAIL -->
+  <section class="view" id="view-detail"></section>
+
+  <!-- SEARCH / MOVIES / SERIES / CATEGORIES -->
+  <section class="view" id="view-search">
+    <h2 class="page-title" id="searchTitle">نتائج البحث</h2>
+    <div class="grid-results" id="searchResults"></div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="view" id="view-contact">
+    <h2 class="page-title">اتصل بنا</h2>
+    <div class="contact-box">
+      <p style="color:var(--text-dim); line-height:2; margin-bottom:18px; font-size:14px;">
+        لأي استفسار أو طلب أو الإبلاغ عن رابط لا يعمل، راسلنا عبر النموذج وسنقوم بالرد في أقرب وقت.
+      </p>
+      <form id="contactForm">
+        <div class="field"><label>الاسم</label><input required placeholder="اسمك"></div>
+        <div class="field"><label>البريد الإلكتروني</label><input required type="email" placeholder="example@email.com"></div>
+        <div class="field"><label>الرسالة</label><textarea required placeholder="اكتب رسالتك هنا..."></textarea></div>
+        <button class="publish-btn" type="submit">إرسال الرسالة</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section class="view" id="view-admin">
+    <div class="admin-panel">
+      <button type="button" class="panel-close" data-nav="home" title="إغلاق">✕</button>
+      <h2>➕ لوحة إضافة ونشر فيلم / مسلسل جديد (سيرفرات متعددة)</h2>
+      <form id="publishForm">
+        <div class="field-grid">
+          <div class="field full"><label>اسم الفيلم / المسلسل بالكامل:</label>
+            <input id="f_title" required placeholder="مثال: فيلم الحرب العالمية الثالثة"></div>
+          <div class="field"><label>القسم (لانشره التلقائي الحي):</label>
+            <select id="f_category">
+              <option value="أفلام عربي">أفلام عربي</option>
+              <option value="أفلام أجنبي">أفلام أجنبي</option>
+              <option value="مسلسلات عربي">مسلسلات عربي</option>
+              <option value="مسلسلات أجنبي">مسلسلات أجنبي</option>
+            </select>
+          </div>
+          <div class="field"><label>التصنيف (النوع):</label>
+            <input id="f_genre" placeholder="كوميدي، فانتازيا، مغامرات"></div>
+          <div class="field"><label>الجودة:</label>
+            <select id="f_quality">
+              <option>FHD</option><option>HD</option><option>4K</option><option>CAM</option>
+            </select>
+          </div>
+          <div class="field"><label>مدة العرض:</label><input id="f_duration" placeholder="100 دقيقة"></div>
+          <div class="field"><label>سنة الإنتاج:</label><input id="f_year" placeholder="2014"></div>
+          <div class="field full"><label>رابط صورة البوستر (URL):</label>
+            <input id="f_poster" placeholder="https://example.com/poster.jpg"></div>
+          <div class="field full"><label>قصة الفيلم الكاملة:</label>
+            <textarea id="f_story" placeholder="اكتب أحداث وقصة الفيلم هنا..."></textarea></div>
+        </div>
+
+        <div class="sub-title">🖥 سيرفرات المشاهدة (رابط مباشر أو كود iframe أو رابط VK):</div>
+        <div id="serversWrap"></div>
+        <button type="button" class="add-row-btn" id="addServer">+ إضافة سيرفر مشاهدة آخر</button>
+
+        <div class="sub-title">⬇ روابط وسيرفرات التحميل المباشر:</div>
+        <div id="downloadsWrap"></div>
+        <button type="button" class="add-row-btn" id="addDownload">+ إضافة رابط تحميل آخر</button>
+
+        <button class="publish-btn" type="submit">⬆ انشر الفيلم في الموقع وولّد الكود</button>
+      </form>
+
+      <div class="code-box-wrap">
+        <div class="code-head"><h3>&lt;/&gt; كود المقالة الجاهز لبلوجر للمنصات المتعددة:</h3>
+          <button class="copy-btn" id="copyCode">نسخ الكود</button></div>
+        <div class="code-box" id="codeBox">سيظهر هنا الكود الخاص بنشر الفيلم فور النشر...</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <b>Egy Cima</b> — موقعك الأول لمشاهدة وتحميل أحدث الأفلام والمسلسلات العربية والأجنبية بجودة عالية.
+  <br>جميع الحقوق محفوظة © 2026
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= STATE ================= */
+let movies = [];
+const CATS = ["أفلام عربي","أفلام أجنبي","مسلسلات عربي","مسلسلات أجنبي"];
+const PLACEHOLDER_BACKDROP = "https://picsum.photos/seed/egycima/1200/500";
+
+function seedMovies(){
+  return [
+    {id:cid(), title:"العودة إلى الحافة", category:"أفلام عربي", genre:"أكشن, إثارة", quality:"FHD", duration:"110 دقيقة", year:"2024",
+     poster:"https://placehold.co/400x600/16141a/d4143a?text=Egy+Cima&font=cairo", story:"بعد سنوات من الغياب يعود ضابط سابق لمواجهة شبكة تهريب تهدد مدينته، في رحلة مليئة بالمطاردات والمفاجآت.",
+     servers:[{name:"سيرفر 1", url:""},{name:"سيرفر 2", url:""}], downloads:[{label:"1080p", url:"#"},{label:"720p", url:"#"}]},
+    {id:cid(), title:"ظل القمر", category:"أفلام عربي", genre:"دراما", quality:"HD", duration:"95 دقيقة", year:"2023",
+     poster:"https://placehold.co/400x600/16141a/d4143a?text=Egy+Cima&font=cairo", story:"قصة إنسانية عن أب يحاول إعادة بناء علاقته بابنته بعد غياب طويل.",
+     servers:[{name:"سيرفر 1", url:""}], downloads:[{label:"720p", url:"#"}]},
+    {id:cid(), title:"Crimson Horizon", category:"أفلام أجنبي", genre:"خيال علمي", quality:"4K", duration:"128 دقيقة", year:"2025",
+     poster:"https://placehold.co/400x600/16141a/d4143a?text=Egy+Cima&font=cairo", story:"طاقم فضائي يكتشف إشارة غامضة تقودهم إلى حافة المجرة، حيث يواجهون سراً قد يغيّر مصير البشرية.",
+     servers:[{name:"سيرفر 1", url:""},{name:"سيرفر 2", url:""},{name:"سيرفر 3", url:""}], downloads:[{label:"1080p", url:"#"},{label:"480p", url:"#"}]},
+    {id:cid(), title:"Silent Ashes", category:"أفلام أجنبي", genre:"رعب", quality:"FHD", duration:"101 دقيقة", year:"2022",
+     poster:"https://placehold.co/400x600/16141a/d4143a?text=Egy+Cima&font=cairo", story:"عائلة تنتقل لمنزل ريفي معزول لتكتشف أن جدرانه تخفي أسراراً مرعبة من الماضي.",
+     servers:[{name:"سيرفر 1", url:""}], downloads:[{label:"1080p", url:"#"}]},
+    {id:cid(), title:"حكاية الأيام الأخيرة", category:"مسلسلات عربي", genre:"دراما اجتماعية", quality:"HD", duration:"30 حلقة", year:"2024",
+     poster:"https://placehold.co/400x600/16141a/d4143a?text=Egy+Cima&font=cairo", story:"مسلسل اجتماعي يتناول قصص متشابكة لعائلات في حي شعبي عبر ثلاثة أجيال.",
+     servers:[{name:"سيرفر 1", url:""},{name:"سيرفر 2", url:""}], downloads:[{label:"720p", url:"#"}]},
+    {id:cid(), title:"The Iron Line", category:"مسلسلات أجنبي", genre:"جريمة, إثارة", quality:"FHD", duration:"8 حلقات", year:"2025",
+     poster:"https://placehold.co/400x600/16141a/d4143a?text=Egy+Cima&font=cairo", story:"محقق فاسد يجد نفسه في مواجهة منظمة إجرامية تسيطر على المدينة من الظل.",
+     servers:[{name:"سيرفر 1", url:""}], downloads:[{label:"1080p", url:"#"},{label:"720p", url:"#"}]},
+  ];
+}
+function cid(){return 'm_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);}
+
+/* ---------- persistence via artifact storage ---------- */
+async function loadMovies(){
+  try{
+    const res = await window.storage.get('egycima_movies', true);
+    if(res && res.value){ movies = JSON.parse(res.value); return; }
+  }catch(e){ /* not found or unavailable */ }
+  movies = seedMovies();
+  try{ await window.storage.set('egycima_movies', JSON.stringify(movies), true); }catch(e){}
+}
+async function saveMovies(){
+  try{ await window.storage.set('egycima_movies', JSON.stringify(movies), true); }catch(e){ console.warn('storage save failed', e); }
+}
+
+/* ================= NAV ================= */
+const views = ['home','detail','search','contact','admin'];
+function goTo(view){
+  views.forEach(v=>document.getElementById('view-'+v).classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active', a.dataset.nav===view));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.addEventListener('click', e=>{
+  const el = e.target.closest('[data-nav]');
+  if(!el) return;
+  e.preventDefault();
+  const v = el.dataset.nav;
+  if(v==='home'){ goTo('home'); renderHome(); }
+  else if(v==='movies'){ showFilteredList('الأفلام', m=>m.category.startsWith('أفلام')); }
+  else if(v==='series'){ showFilteredList('المسلسلات', m=>m.category.startsWith('مسلسلات')); }
+  else if(v==='categories'){ showCategories(); }
+  else if(v==='contact'){ goTo('contact'); }
+  else if(v==='admin'){ goTo('admin'); }
+});
+
+/* ================= RENDER HELPERS ================= */
+function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function cardHTML(m){
+  return `<div class="card" data-id="${m.id}">
+    <div class="poster-wrap">
+      <img src="${escapeHtml(m.poster)}" alt="${escapeHtml(m.title)}" loading="lazy">
+      <span class="badge">${escapeHtml(m.quality||'HD')}</span>
+      <span class="badge cat">${escapeHtml(m.category.split(' ')[0])}</span>
+      <div class="play-hint"><div class="circle">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+      </div></div>
+    </div>
+    <div class="card-title">${escapeHtml(m.title)}</div>
+    <div class="card-sub"><span class="star">★</span> ${escapeHtml(m.year||'')} · ${escapeHtml(m.genre||'')}</div>
+  </div>`;
+}
+document.addEventListener('click', e=>{
+  const card = e.target.closest('.card');
+  if(card){ openDetail(card.dataset.id); }
+});
+
+function renderMarquee(){
+  const latest = movies.slice(0,8).map(m=>m.title).join('   •   ');
+  document.getElementById('marqueeText').innerHTML = `<b>أحدث الإضافات:</b> ${escapeHtml(latest || 'لا توجد إضافات بعد')}`;
+}
+
+function renderHome(){
+  const hero = document.getElementById('hero');
+  if(movies.length){
+    const m = movies[0];
+    hero.innerHTML = `
+      <img class="backdrop" src="${escapeHtml(m.poster)}" alt="">
+      <div class="hero-content">
+        <span class="hero-badge">🔥 الأحدث إضافة</span>
+        <h1>${escapeHtml(m.title)}</h1>
+        <div class="hero-meta">
+          <span>${escapeHtml(m.category)}</span>
+          <span>${escapeHtml(m.year||'')}</span>
+          <span>${escapeHtml(m.duration||'')}</span>
+          <span>${escapeHtml(m.quality||'')}</span>
+        </div>
+        <p class="hero-desc">${escapeHtml(m.story || 'لا يوجد وصف متاح لهذا العمل حالياً.')}</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="openDetail('${m.id}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg> مشاهدة الآن
+          </button>
+          <button class="btn btn-ghost" onclick="openDetail('${m.id}')">تفاصيل أكثر</button>
+        </div>
+      </div>`;
+  } else {
+    hero.innerHTML = `<img class="backdrop" src="${PLACEHOLDER_BACKDROP}" alt="">
+      <div class="hero-content"><h1>مرحباً بك في Egy Cima</h1>
+      <p class="hero-desc">لا توجد أعمال مضافة حتى الآن، ابدأ بإضافة أول عمل من لوحة التحكم.</p></div>`;
+  }
+
+  const sections = [
+    ["أحدث الأفلام والمسلسلات المضافة حديثاً", m=>true, 12],
+    ["قسم الأفلام العربية", m=>m.category==='أفلام عربي', 20],
+    ["قسم الأفلام الأجنبية", m=>m.category==='أفلام أجنبي', 20],
+    ["قسم المسلسلات العربية", m=>m.category==='مسلسلات عربي', 20],
+    ["قسم المسلسلات الأجنبية", m=>m.category==='مسلسلات أجنبي', 20],
+  ];
+  const wrap = document.getElementById('homeSections');
+  wrap.innerHTML = sections.map(([title, filt, limit])=>{
+    const list = movies.filter(filt).slice(0,limit);
+    return `<div class="section">
+      <div class="section-head">
+        <div class="section-eyebrow"><span></span><span></span><span></span></div>
+        <h2>${title}</h2>
+        <span class="count">${list.length} عمل</span>
+      </div>
+      ${list.length ? `<div class="row">${list.map(cardHTML).join('')}</div>`
+        : `<div class="empty-state">لا توجد أعمال مضافة في هذا القسم حالياً.</div>`}
+    </div>`;
+  }).join('');
+  renderMarquee();
+}
+
+function openDetail(id){
+  const m = movies.find(x=>x.id===id);
+  if(!m) return;
+  const el = document.getElementById('view-detail');
+  const servers = (m.servers||[]).filter(s=>s.name);
+  const downloads = (m.downloads||[]).filter(d=>d.label);
+  el.innerHTML = `
+    <div class="detail-top">
+      <button type="button" class="panel-close on-image" data-nav="home" title="إغلاق">✕</button>
+      <img class="backdrop" src="${escapeHtml(m.poster)}" alt="">
+    </div>
+    <div class="detail-body">
+      <img class="detail-poster" src="${escapeHtml(m.poster)}" alt="${escapeHtml(m.title)}">
+      <div class="detail-info">
+        <h1>${escapeHtml(m.title)}</h1>
+        <div class="detail-tags">
+          <span>${escapeHtml(m.category)}</span>
+          <span>${escapeHtml(m.genre||'')}</span>
+          <span>${escapeHtml(m.year||'')}</span>
+          <span>${escapeHtml(m.duration||'')}</span>
+          <span>${escapeHtml(m.quality||'')}</span>
+        </div>
+        <p class="detail-story">${escapeHtml(m.story || 'لا يوجد وصف لهذا العمل بعد.')}</p>
+      </div>
+    </div>
+    <h3 class="sub-title" style="margin-top:10px;">🖥 سيرفرات المشاهدة</h3>
+    <div class="tabs" id="tabs"></div>
+    <div class="player" id="player"><div class="placeholder">اختر سيرفر مشاهدة من الأعلى لبدء العرض.</div></div>
+    <h3 class="sub-title">⬇ روابط التحميل المباشر</h3>
+    <div class="dl-list">
+      ${downloads.length ? downloads.map(d=>`
+        <div class="dl-row">
+          <div class="dl-left"><span class="qtag">${escapeHtml(d.label)}</span><span>${escapeHtml(m.title)}</span></div>
+          <a class="dl-btn" href="${escapeHtml(d.url||'#')}" target="_blank" rel="noopener">تحميل</a>
+        </div>`).join('') : `<div class="empty-state">لا توجد روابط تحميل مضافة لهذا العمل حالياً.</div>`}
+    </div>
+  `;
+  const tabsEl = document.getElementById('tabs');
+  const playerEl = document.getElementById('player');
+  if(servers.length){
+    tabsEl.innerHTML = servers.map((s,i)=>`<button class="tab-btn ${i===0?'active':''}" data-i="${i}">${escapeHtml(s.name)}</button>`).join('');
+    tabsEl.querySelectorAll('.tab-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        tabsEl.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const s = servers[btn.dataset.i];
+        playerEl.innerHTML = s.url ? `<iframe src="${escapeHtml(s.url)}" allowfullscreen></iframe>`
+          : `<div class="placeholder">لم يتم إضافة رابط فعلي لهذا السيرفر بعد.</div>`;
+      });
+    });
+    tabsEl.querySelector('.tab-btn').click();
+  } else {
+    tabsEl.innerHTML = `<div class="empty-state">لا توجد سيرفرات مشاهدة مضافة حالياً.</div>`;
+  }
+  goTo('detail');
+}
+
+function showFilteredList(title, filt){
+  document.getElementById('searchTitle').textContent = title;
+  const list = movies.filter(filt);
+  document.getElementById('searchResults').innerHTML = list.length ? list.map(cardHTML).join('')
+    : `<div class="empty-state" style="grid-column:1/-1;">لا توجد نتائج لعرضها حالياً.</div>`;
+  goTo('search');
+}
+function showCategories(){
+  const genres = [...new Set(movies.flatMap(m=>(m.genre||'').split(',').map(g=>g.trim()).filter(Boolean)))];
+  document.getElementById('searchTitle').textContent = 'التصنيفات';
+  document.getElementById('searchResults').innerHTML = genres.length ? `
+    <div style="grid-column:1/-1; display:flex; flex-wrap:wrap; gap:10px;">
+      ${genres.map(g=>`<span class="badge cat" style="position:static; font-size:13px; padding:8px 16px; cursor:pointer;" data-genre="${escapeHtml(g)}">${escapeHtml(g)}</span>`).join('')}
+    </div>` : `<div class="empty-state" style="grid-column:1/-1;">لا توجد تصنيفات بعد.</div>`;
+  document.querySelectorAll('[data-genre]').forEach(el=>{
+    el.addEventListener('click', ()=> showFilteredList('تصنيف: '+el.dataset.genre, m=>(m.genre||'').includes(el.dataset.genre)));
+  });
+  goTo('search');
+}
+
+document.getElementById('searchForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const q = document.getElementById('searchInput').value.trim();
+  if(!q) return;
+  showFilteredList(`نتائج البحث عن: "${q}"`, m=>m.title.toLowerCase().includes(q.toLowerCase()));
+});
+
+document.getElementById('contactForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  showToast('تم إرسال رسالتك بنجاح، سنتواصل معك قريباً.');
+  e.target.reset();
+});
+
+/* ================= ADMIN FORM ================= */
+function serverRow(name='', url=''){
+  const row = document.createElement('div');
+  row.className = 'dyn-row';
+  row.innerHTML = `
+    <input class="srv-name" placeholder="اسم السيرفر (مثال: سيرفر 1 VIP)" value="${escapeHtml(name)}">
+    <input class="srv-url" placeholder="رابط السيرفر المباشر أو فيديو VK" value="${escapeHtml(url)}">
+    <button type="button" class="icon-btn remove">✕</button>`;
+  row.querySelector('.remove').addEventListener('click', ()=>row.remove());
+  return row;
+}
+function downloadRow(label='', url=''){
+  const row = document.createElement('div');
+  row.className = 'dyn-row';
+  row.innerHTML = `
+    <input class="dl-name" placeholder="اسم الجودة (مثال: تحميل بجودة 1080p)" value="${escapeHtml(label)}">
+    <input class="dl-url" placeholder="رابط التحميل المباشر" value="${escapeHtml(url)}">
+    <button type="button" class="icon-btn remove">✕</button>`;
+  row.querySelector('.remove').addEventListener('click', ()=>row.remove());
+  return row;
+}
+const serversWrap = document.getElementById('serversWrap');
+const downloadsWrap = document.getElementById('downloadsWrap');
+serversWrap.appendChild(serverRow());
+downloadsWrap.appendChild(downloadRow());
+document.getElementById('addServer').addEventListener('click', ()=>serversWrap.appendChild(serverRow()));
+document.getElementById('addDownload').addEventListener('click', ()=>downloadsWrap.appendChild(downloadRow()));
+
+document.getElementById('publishForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const title = document.getElementById('f_title').value.trim();
+  if(!title){ showToast('من فضلك أدخل اسم الفيلم أولاً.'); return; }
+  const poster = document.getElementById('f_poster').value.trim() || `https://placehold.co/400x600/16141a/d4143a?text=${encodeURIComponent(title)}`;
+
+  const servers = [...serversWrap.querySelectorAll('.dyn-row')].map(r=>({
+    name: r.querySelector('.srv-name').value.trim(),
+    url: r.querySelector('.srv-url').value.trim()
+  })).filter(s=>s.name);
+
+  const downloads = [...downloadsWrap.querySelectorAll('.dyn-row')].map(r=>({
+    label: r.querySelector('.dl-name').value.trim(),
+    url: r.querySelector('.dl-url').value.trim()
+  })).filter(d=>d.label);
+
+  const movie = {
+    id: cid(),
+    title,
+    category: document.getElementById('f_category').value,
+    genre: document.getElementById('f_genre').value.trim(),
+    quality: document.getElementById('f_quality').value,
+    duration: document.getElementById('f_duration').value.trim(),
+    year: document.getElementById('f_year').value.trim(),
+    poster,
+    story: document.getElementById('f_story').value.trim(),
+    servers, downloads
+  };
+  movies.unshift(movie);
+  await saveMovies();
+
+  document.getElementById('codeBox').textContent = buildEmbedCode(movie);
+  showToast('✅ تم نشر العمل في الموقع بنجاح!');
+  renderHome();
+
+  e.target.reset();
+  serversWrap.innerHTML=''; serversWrap.appendChild(serverRow());
+  downloadsWrap.innerHTML=''; downloadsWrap.appendChild(downloadRow());
+});
+
+function buildEmbedCode(m){
+  const uid = 'ec_' + m.id;
+  const servers = (m.servers||[]).filter(s=>s.name);
+  const downloads = (m.downloads||[]).filter(d=>d.label);
+
+  const tabsHtml = servers.map((s,i)=>
+    `<button type="button" class="${uid}_tab" data-src="${escapeHtml(s.url||'')}"
+      style="padding:9px 16px;border-radius:8px;border:1px solid ${i===0?'#d4143a':'#2a262c'};
+      background:${i===0?'#d4143a':'#18161a'};color:#fff;font-weight:700;font-size:13px;cursor:pointer;margin:0 4px 8px 0;">
+      ${s.name}</button>`).join('');
+
+  const serverUrls = servers.map(s=>s.url||'');
+
+  const dlHtml = downloads.map(d=>
+    `<div style="display:flex;align-items:center;justify-content:space-between;background:#18161a;
+      border:1px solid #2a262c;border-radius:10px;padding:12px 16px;margin-bottom:8px;">
+      <span><b style="background:#5c0e1f;color:#ff2d4a;padding:3px 10px;border-radius:6px;font-size:12px;margin-left:8px;">${d.label}</b>
+      ${m.title}</span>
+      <a href="${d.url||'#'}" target="_blank" rel="noopener nofollow"
+        style="background:#d4143a;color:#fff;padding:8px 16px;border-radius:7px;font-weight:700;font-size:13px;text-decoration:none;">تحميل</a>
+    </div>`).join('');
+
+  return `<!-- Egy Cima :: ${m.title} :: انسخ هذا الكود كاملاً والصقه في مقالة بلوجر جديدة وأنت في وضع "HTML" (وليس Compose)، ولا تنتقل لوضع Compose بعد اللصق حتى لا يتلف الكود -->
+<div dir="rtl" style="font-family:Tajawal,Cairo,Arial,sans-serif;background:#0a0a0d;color:#f3efee;padding:20px;border-radius:14px;max-width:900px;margin:0 auto;">
+
+  <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px;">
+    <img src="${m.poster}" alt="${m.title}" style="width:200px;border-radius:10px;border:1px solid #2a262c;flex:none;">
+    <div style="flex:1;min-width:240px;">
+      <h1 style="font-size:24px;font-weight:900;margin:0 0 10px;">${m.title} (${m.year||''})</h1>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <span style="background:#211d22;border:1px solid #2a262c;padding:4px 10px;border-radius:6px;font-size:12px;">${m.category}</span>
+        <span style="background:#211d22;border:1px solid #2a262c;padding:4px 10px;border-radius:6px;font-size:12px;">${m.genre||''}</span>
+        <span style="background:#211d22;border:1px solid #2a262c;padding:4px 10px;border-radius:6px;font-size:12px;">${m.duration||''}</span>
+        <span style="background:#d4143a;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:800;">${m.quality||''}</span>
+      </div>
+      <p style="color:#a79ca1;line-height:1.9;font-size:14.5px;">${(m.story||'لا يوجد وصف.').replace(/\n/g,' ')}</p>
+    </div>
+  </div>
+
+  <h3 style="color:#ff2d4a;font-size:16px;margin:20px 0 10px;">🖥 سيرفرات المشاهدة</h3>
+  <div style="margin-bottom:10px;">${tabsHtml || '<span style="color:#a79ca1;font-size:13px;">لا توجد سيرفرات مضافة.</span>'}</div>
+  <div style="background:#000;border:1px solid #2a262c;border-radius:12px;overflow:hidden;aspect-ratio:16/9;margin-bottom:24px;">
+    <iframe id="${uid}_frame" src="${serverUrls[0]||''}" allowfullscreen style="width:100%;height:100%;border:0;"></iframe>
+  </div>
+
+  <h3 style="color:#ff2d4a;font-size:16px;margin:20px 0 10px;">⬇ روابط التحميل المباشر</h3>
+  ${dlHtml || '<span style="color:#a79ca1;font-size:13px;">لا توجد روابط تحميل مضافة.</span>'}
+
+</div>
+
+<scr` + `ipt>
+(function(){
+  var group = document.querySelectorAll('.${uid}_tab');
+  var frame = document.getElementById('${uid}_frame');
+  for (var i = 0; i < group.length; i++){
+    group[i].addEventListener('click', function(){
+      if(frame) frame.src = this.getAttribute('data-src') || '';
+      for (var k = 0; k < group.length; k++){
+        var active = (group[k] === this);
+        group[k].style.background = active ? '#d4143a' : '#18161a';
+        group[k].style.borderColor = active ? '#d4143a' : '#2a262c';
+      }
+    });
+  }
+})();
+</scr` + `ipt>`;
+}
+document.getElementById('copyCode').addEventListener('click', ()=>{
+  const text = document.getElementById('codeBox').textContent;
+  navigator.clipboard?.writeText(text).then(()=>showToast('تم نسخ الكود إلى الحافظة.'))
+    .catch(()=>showToast('تعذر نسخ الكود تلقائياً، انسخه يدوياً.'));
+});
+
+/* ================= TOAST ================= */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+/* ================= INIT ================= */
+(async function init(){
+  await loadMovies();
+  renderHome();
+})();
+</script>
+</body>
+</html>
