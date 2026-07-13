@@ -454,6 +454,7 @@ footer b{color:var(--red-bright);}
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ================= STATE ================= */
 let movies = [];
@@ -484,17 +485,59 @@ function seedMovies(){
 }
 function cid(){return 'm_'+Math.random().toString(36).slice(2,10)+Date.now().toString(36);}
 
-/* ---------- persistence via artifact storage ---------- */
+/* ---------- Supabase connection ---------- */
+const SUPABASE_URL = 'https://rpwnexzpzjdgyqtocbkf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwd25leHpwempkZ3lxdG9jYmtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5Njk5MTIsImV4cCI6MjA5OTU0NTkxMn0.3qmZNlvbE6JfOq5sON2MUpqZSxXmWxDNGbsMydOFsxo';
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+/* ---------- persistence via Supabase ---------- */
 async function loadMovies(){
+  if(!sb){ movies = seedMovies(); showToast('تعذر الاتصال بمكتبة Supabase، تم عرض بيانات تجريبية.'); return; }
   try{
-    const res = await window.storage.get('egycima_movies', true);
-    if(res && res.value){ movies = JSON.parse(res.value); return; }
-  }catch(e){ /* not found or unavailable */ }
-  movies = seedMovies();
-  try{ await window.storage.set('egycima_movies', JSON.stringify(movies), true); }catch(e){}
+    const { data, error } = await sb.from('movies').select('*').order('created_at', { ascending:false });
+    if(error) throw error;
+    movies = (data||[]).map(row => ({
+      id: row.id,
+      title: row.title,
+      category: row.category,
+      genre: row.genre,
+      quality: row.quality,
+      duration: row.duration,
+      year: row.year,
+      poster: row.poster,
+      story: row.story,
+      servers: row.servers || [],
+      downloads: row.downloads || []
+    }));
+  }catch(e){
+    console.error('Supabase load failed:', e);
+    showToast('تعذر تحميل البيانات من قاعدة البيانات، تحقق من إعدادات Supabase.');
+    movies = [];
+  }
 }
-async function saveMovies(){
-  try{ await window.storage.set('egycima_movies', JSON.stringify(movies), true); }catch(e){ console.warn('storage save failed', e); }
+async function saveMovieToDb(movie){
+  if(!sb){ showToast('لم يتم الحفظ في قاعدة البيانات (Supabase غير متصل).'); return false; }
+  try{
+    const { error } = await sb.from('movies').insert([{
+      id: movie.id,
+      title: movie.title,
+      category: movie.category,
+      genre: movie.genre,
+      quality: movie.quality,
+      duration: movie.duration,
+      year: movie.year,
+      poster: movie.poster,
+      story: movie.story,
+      servers: movie.servers,
+      downloads: movie.downloads
+    }]);
+    if(error) throw error;
+    return true;
+  }catch(e){
+    console.error('Supabase insert failed:', e);
+    showToast('حدث خطأ أثناء حفظ الفيلم في قاعدة البيانات. تحقق من إعدادات الجدول والصلاحيات.');
+    return false;
+  }
 }
 
 /* ================= NAV ================= */
@@ -744,10 +787,10 @@ document.getElementById('publishForm').addEventListener('submit', async e=>{
     servers, downloads
   };
   movies.unshift(movie);
-  await saveMovies();
+  const ok = await saveMovieToDb(movie);
 
   document.getElementById('codeBox').textContent = buildEmbedCode(movie);
-  showToast('✅ تم نشر العمل في الموقع بنجاح!');
+  showToast(ok ? '✅ تم نشر العمل في قاعدة البيانات وظهر في الموقع للجميع!' : '⚠ تم عرضه محليًا فقط، لم يُحفظ في قاعدة البيانات.');
   renderHome();
 
   e.target.reset();
